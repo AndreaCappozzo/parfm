@@ -1,4 +1,7 @@
 export(        parfm, 
+               obsdata_creator,
+               loglikelihood_i,
+               paramaters_transformator,
          anova.parfm,
           coef.parfm,
             ci.parfm,
