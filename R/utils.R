@@ -287,35 +287,47 @@ loglikelihood_i <- function(p,
   # ---- log[ (-1)^di L^(di)(cumhaz) ]-------------------------------------- #
   logSurv <- NULL
   # FIXME bug in logSurv calculation. To be checked: I should compute the surv contribution to the frailty only for the subset of obs belonging to the cluster
+  # Here I use an approximation in which substantially I swap the integration and the product in the calculation of the Laplace transform
   if (frailty == "gamma") {
-    logSurv <- mapply(fr.gamma, 
-                      k = obs$di, s = as.numeric(cumhaz[[1]]), 
-                      theta = rep(theta, obs$ncl), 
-                      what = "logLT") 
+    # logSurv <- mapply(fr.gamma, 
+    #                   k = obs$di, s = as.numeric(cumhaz[[1]]), 
+    #                   theta = rep(theta, obs$ncl), 
+    #                   what = "logLT") 
+    logSurv_i <- sapply(1:length(cumhaz_i), function(i) fr.gamma(
+                      k = obs$event[i], s = cumhaz_i[i], 
+                      theta = theta, 
+                      what = "logLT")) 
   } else if (frailty == "ingau") {
-    logSurv <- mapply(fr.ingau, 
-                      k = obs$di, s = as.numeric(cumhaz[[1]]), 
-                      theta = rep(theta, obs$ncl), 
-                      what = "logLT") 
+    # logSurv <- mapply(fr.ingau, 
+    #                   k = obs$di, s = as.numeric(cumhaz[[1]]), 
+    #                   theta = rep(theta, obs$ncl), 
+    #                   what = "logLT") 
+    logSurv_i <- sapply(1:length(cumhaz_i), function(i) fr.ingau(
+      k = obs$event[i], s = cumhaz_i[i], 
+      theta = theta, 
+      what = "logLT")) 
   } else if (frailty == "possta") {
-    logSurv <- sapply(1:obs$ncl, 
-                      function(x) fr.possta(k = obs$di[x], 
-                                            s = as.numeric(cumhaz[[1]])[x], 
-                                            nu = nu, Omega = Omega, 
-                                            what = "logLT",
-                                            correct = correct))
+    # logSurv <- sapply(1:obs$ncl, 
+    #                   function(x) fr.possta(k = obs$di[x], 
+    #                                         s = as.numeric(cumhaz[[1]])[x], 
+    #                                         nu = nu, Omega = Omega, 
+    #                                         what = "logLT",
+    #                                         correct = correct))
+    logSurv_i <- sapply(1:length(cumhaz_i), function(i) fr.possta(
+      k = obs$event[i], s = cumhaz_i[i], 
+      nu = nu, Omega = Omega, 
+      what = "logLT", correct=correct)) 
   } else if (frailty == "lognormal") {
-    logSurv <- mapply(fr.lognormal, 
-                      k = obs$di, s = as.numeric(cumhaz[[1]]), 
-                      sigma2 = rep(sigma2, obs$ncl), 
-                      what = "logLT")
-  }
-  
-  if (frailty == "none") {
+    # logSurv <- mapply(fr.lognormal, 
+    #                   k = obs$di, s = as.numeric(cumhaz[[1]]), 
+    #                   sigma2 = rep(sigma2, obs$ncl), 
+    #                   what = "logLT")
+    logSurv_i <- sapply(1:length(cumhaz_i), function(i) fr.lognormal(
+      k = obs$event[i], s = cumhaz_i[i], 
+      sigma2=sigma2, 
+      what = "logLT")) 
+  } else if (frailty == "none") {
     logSurv_i <- mapply(fr.none, s = cumhaz_i, what = "logLT")
-  }else{
-    n_cluster <- table(obs$cluster) # I assume that the frailty contribution for each obs is the same for every obs in a cluster
-    logSurv_i <- logSurv[obs$cluster]/n_cluster[obs$cluster] # FIXME think about whether this is a sensible strategy
   }
   
   # ---- Log likelihood (vector of length n) ------------------------------------------ #
