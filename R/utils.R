@@ -286,8 +286,6 @@ loglikelihood_i <- function(p,
   
   # ---- log[ (-1)^di L^(di)(cumhaz) ]-------------------------------------- #
   logSurv <- NULL
-  # FIXME bug in logSurv calculation. To be checked: I should compute the surv contribution to the frailty only for the subset of obs belonging to the cluster
-  # Here I use an approximation in which substantially I swap the integration and the product in the calculation of the Laplace transform
   if (frailty == "gamma") {
     # logSurv <- mapply(fr.gamma, 
     #                   k = obs$di, s = as.numeric(cumhaz[[1]]), 

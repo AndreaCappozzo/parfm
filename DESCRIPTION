@@ -27,3 +27,4 @@ Author: Federico Rotolo [aut, cre],
 Maintainer: Federico Rotolo <federico.rotolo@innate-pharma.fr>
 Repository: CRAN
 Date/Publication: 2018-11-07 00:10:07 UTC
+RoxygenNote: 7.2.1
