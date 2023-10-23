@@ -2,13 +2,11 @@
 #  Prediction of frailties                                                     #
 ################################################################################
 #                                                                              #
-#  Computes the prediction of the fraities as                                  #
+#  Computes the prediction of the fraities (both expected value and variances) #
 #                                                                              #
 #  Its only parameter is                                                       #
 #   - object  : the fitted model, object of class 'parfm'                      #
 #                                                                              #
-#   Date: February 02, 2012                                                    #
-#   Last modification: January 30, 2017                                        #
 ################################################################################
 
 predict.parfm <- function(object,
@@ -79,5 +77,5 @@ predict.parfm <- function(object,
   attr(res_var, "frailty") <- attr(object, "frailty")
   attr(res_var, "dist") <- attr(object, "dist")
   
-  return(list(res,res_var))
+  return(list("E_frailty"=res,"V_frailty"=res_var))
 }
