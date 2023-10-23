@@ -45,10 +45,39 @@ predict.parfm <- function(object,
       function(x) eval(parse(text = x)),
    USE.NAMES = FALSE)))
   }, USE.NAMES = FALSE)
+
+  ### Compute second moment
+
+  mom_2 <- sapply(clusters, FUN = function(h) {
+    exp(diff(sapply(
+      paste("frailty(k=attributes(object)$di['", h, "']+", c(0,2),
+                    ", s=cumhaz['", h, "'], ",
+            paste(frPar, collapse = "="), ", ",
+            ifelse(attributes(object)$frailty == "possta", 
+                   paste("Omega=Omega(D=max(di)+1, ",
+                         "correct=", attr(object, 'correct'), 
+                         ", nu=", frPar[2] ,")",
+                         ", correct=", attr(object, 'correct'), ", ",
+                         sep = ""),
+                   ""),
+            "what='logLT'",
+            ")", sep = ""),
+      function(x) eval(parse(text = x)),
+   USE.NAMES = FALSE)))
+  }, USE.NAMES = FALSE)
+
+  ### Compute variance
+  res_var = mom_2 - res^2
   
   class(res) <- "predict.parfm"
   attr(res, "clustname") <- attr(object, "clustname")
   attr(res, "frailty") <- attr(object, "frailty")
   attr(res, "dist") <- attr(object, "dist")
-  return(res)
+
+  class(res_var) <- "predict.parfm"
+  attr(res_var, "clustname") <- attr(object, "clustname")
+  attr(res_var, "frailty") <- attr(object, "frailty")
+  attr(res_var, "dist") <- attr(object, "dist")
+  
+  return(list(res,res_var))
 }
